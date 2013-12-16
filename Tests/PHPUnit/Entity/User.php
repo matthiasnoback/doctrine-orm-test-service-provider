@@ -10,7 +10,7 @@ class User
     /**
      * @Id
      * @Column(type="integer")
-     * @GeneratedValue(strategy="IDENTITY")
+     * @GeneratedValue(strategy="AUTO")
      */
     private $id;
 

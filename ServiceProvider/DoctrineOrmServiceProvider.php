@@ -2,6 +2,7 @@
 
 namespace Noback\PHPUnitTestServiceContainer\ServiceProvider;
 
+use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\ORM\Tools\Setup;
@@ -10,20 +11,25 @@ use Noback\PHPUnitTestServiceContainer\ServiceProviderInterface;
 
 class DoctrineOrmServiceProvider implements ServiceProviderInterface
 {
-    private $modelDirectories;
-    private $modelClasses;
+    private $entityClasses;
 
-    public function __construct(array $modelDirectories, array $modelClasses)
+    public function __construct(array $entityClasses = array())
     {
-        $this->modelDirectories = $modelDirectories;
-        $this->modelClasses = $modelClasses;
+        $this->entityClasses = $entityClasses;
     }
 
     public function register(ServiceContainerInterface $serviceContainer)
     {
-        $serviceContainer['doctrine_orm.model_classes'] = $this->modelClasses;
-        $serviceContainer['doctrine_orm.model_directories'] = $this->modelDirectories;
-        $serviceContainer['doctrine_orm.dev_mode'] = true;
+        $serviceContainer['doctrine_orm.entity_classes'] = $this->entityClasses;
+        $serviceContainer['doctrine_orm.entity_directories'] = array();
+        $serviceContainer['doctrine_orm.development_mode'] = true;
+        $serviceContainer['doctrine_orm.proxy_dir'] = sys_get_temp_dir();
+
+        $serviceContainer['doctrine_orm.driver_cache'] = $serviceContainer->share(
+            function () {
+                return new ArrayCache();
+            }
+        );
 
         $serviceContainer['doctrine_orm.entity_manager'] = $serviceContainer->share(
             function (ServiceContainerInterface $serviceContainer) {
@@ -38,8 +44,10 @@ class DoctrineOrmServiceProvider implements ServiceProviderInterface
         $serviceContainer['doctrine_orm.configuration'] = $serviceContainer->share(
             function ($serviceContainer) {
                 return Setup::createAnnotationMetadataConfiguration(
-                    $serviceContainer['doctrine_orm.model_directories'],
-                    $serviceContainer['doctrine_orm.dev_mode']
+                    $serviceContainer['doctrine_orm.entity_directories'],
+                    $serviceContainer['doctrine_orm.development_mode'],
+                    $serviceContainer['doctrine_orm.proxy_dir'],
+                    $serviceContainer['doctrine_orm.driver_cache']
                 );
             }
         );
@@ -47,22 +55,41 @@ class DoctrineOrmServiceProvider implements ServiceProviderInterface
 
     public function setUp(ServiceContainerInterface $serviceContainer)
     {
-        $entityManager = $serviceContainer['doctrine_orm.entity_manager'];
-        /* @var $entityManager \Doctrine\ORM\EntityManager */
-
-        $schema = array_map(
-            function ($class) use ($entityManager) {
-                return $entityManager->getClassMetadata($class);
-            },
-            $serviceContainer['doctrine_orm.model_classes']
+        $this->createSchema(
+            $serviceContainer['doctrine_orm.entity_manager'],
+            $serviceContainer['doctrine_orm.entity_classes']
         );
-
-        $schemaTool = new SchemaTool($entityManager);
-        $schemaTool->dropSchema(array());
-        $schemaTool->createSchema($schema);
     }
 
     public function tearDown(ServiceContainerInterface $serviceContainer)
     {
+        $this->dropSchema(
+            $serviceContainer['doctrine_orm.entity_manager'],
+            $serviceContainer['doctrine_orm.entity_classes']
+        );
+    }
+
+    private function createSchema(EntityManager $entityManager, array $classes)
+    {
+        $schemaTool = new SchemaTool($entityManager);
+        $schemaTool->createSchema($this->getClassMetadatas($entityManager, $classes));
+    }
+
+    private function dropSchema(EntityManager $entityManager, array $classes)
+    {
+        $schemaTool = new SchemaTool($entityManager);
+        $schemaTool->dropSchema($this->getClassMetadatas($entityManager, $classes));
+    }
+
+    private function getClassMetadatas(EntityManager $entityManager, array $classes)
+    {
+        $classMetadatas = array_map(
+            function ($class) use ($entityManager) {
+                return $entityManager->getClassMetadata($class);
+            },
+            $classes
+        );
+
+        return $classMetadatas;
     }
 }

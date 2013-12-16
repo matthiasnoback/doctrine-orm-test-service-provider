@@ -7,14 +7,7 @@ use Noback\PHPUnitTestServiceContainer\Tests\PHPUnit\Entity\User;
 
 class AbstractTestCaseWithEntityManagerTest extends AbstractTestCaseWithEntityManager
 {
-    protected function getModelDirectories()
-    {
-        return array(
-            __DIR__.'/Entity'
-        );
-    }
-
-    protected function getModelClasses()
+    protected function getEntityClasses()
     {
         return array(
             'Noback\PHPUnitTestServiceContainer\Tests\PHPUnit\Entity\User'
@@ -36,5 +29,21 @@ class AbstractTestCaseWithEntityManagerTest extends AbstractTestCaseWithEntityMa
 
         $retrievedUser = $this->getEntityManager()->find(get_class($user), $user->getId());
         $this->assertSame($retrievedUser->getName(), $user->getName());
+    }
+
+    /**
+     * @test
+     */
+    public function a_new_test_has_a_fresh_database()
+    {
+        $count = $this
+            ->getEntityManager()
+            ->getRepository('Noback\PHPUnitTestServiceContainer\Tests\PHPUnit\Entity\User')
+            ->createQueryBuilder('u')
+            ->select('COUNT(u.id) as number_of_users')
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        $this->assertSame(0, (integer) $count);
     }
 }
