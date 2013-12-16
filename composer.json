@@ -1,0 +1,27 @@
+{
+    "name": "matthiasnoback/doctrine-orm-test-service-provider",
+    "type": "library",
+    "description": "Service provider for tests in need of a Doctrine entity manager",
+    "keywords": ["PHPUnit", "Doctrine ORM", "service provider"],
+    "homepage": "http://github.com/matthiasnoback/doctrine-orm-test-service-provider",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Matthias Noback",
+            "email": "matthiasnoback@gmail.com",
+            "homepage": "http://php-and-symfony.matthiasnoback.nl"
+        }
+    ],
+    "require": {
+        "matthiasnoback/phpunit-test-service-container": "dev-master",
+        "matthiasnoback/doctrine-dbal-test-service-provider": "dev-master",
+        "doctrine/orm": "2.*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "3.*"
+    },
+    "target-dir": "Noback/PHPUnitTestServiceContainer",
+    "autoload": {
+        "psr-0" : { "Noback\\PHPUnitTestServiceContainer" : "" }
+    }
+}
