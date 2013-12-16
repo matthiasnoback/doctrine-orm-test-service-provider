@@ -11,17 +11,16 @@ use Noback\PHPUnitTestServiceContainer\ServiceProviderInterface;
 
 class DoctrineOrmServiceProvider implements ServiceProviderInterface
 {
-    private $entityClasses;
+    private $entityDirectories;
 
-    public function __construct(array $entityClasses = array())
+    public function __construct(array $entityDirectories = array())
     {
-        $this->entityClasses = $entityClasses;
+        $this->entityDirectories = $entityDirectories;
     }
 
     public function register(ServiceContainerInterface $serviceContainer)
     {
-        $serviceContainer['doctrine_orm.entity_classes'] = $this->entityClasses;
-        $serviceContainer['doctrine_orm.entity_directories'] = array();
+        $serviceContainer['doctrine_orm.entity_directories'] = $this->entityDirectories;
         $serviceContainer['doctrine_orm.development_mode'] = true;
         $serviceContainer['doctrine_orm.proxy_dir'] = sys_get_temp_dir();
 
@@ -42,7 +41,7 @@ class DoctrineOrmServiceProvider implements ServiceProviderInterface
         );
 
         $serviceContainer['doctrine_orm.configuration'] = $serviceContainer->share(
-            function ($serviceContainer) {
+            function (ServiceContainerInterface $serviceContainer) {
                 return Setup::createAnnotationMetadataConfiguration(
                     $serviceContainer['doctrine_orm.entity_directories'],
                     $serviceContainer['doctrine_orm.development_mode'],
@@ -51,45 +50,42 @@ class DoctrineOrmServiceProvider implements ServiceProviderInterface
                 );
             }
         );
+
+        $serviceContainer['doctrine_orm.schema_tool'] = $serviceContainer->share(
+            function (ServiceContainerInterface $serviceContainer) {
+                return new SchemaTool($serviceContainer['doctrine_orm.entity_manager']);
+            }
+        );
     }
 
     public function setUp(ServiceContainerInterface $serviceContainer)
     {
         $this->createSchema(
-            $serviceContainer['doctrine_orm.entity_manager'],
-            $serviceContainer['doctrine_orm.entity_classes']
+            $serviceContainer['doctrine_orm.schema_tool'],
+            $serviceContainer['doctrine_orm.entity_manager']
         );
     }
 
     public function tearDown(ServiceContainerInterface $serviceContainer)
     {
         $this->dropSchema(
-            $serviceContainer['doctrine_orm.entity_manager'],
-            $serviceContainer['doctrine_orm.entity_classes']
+            $serviceContainer['doctrine_orm.schema_tool'],
+            $serviceContainer['doctrine_orm.entity_manager']
         );
     }
 
-    private function createSchema(EntityManager $entityManager, array $classes)
+    private function createSchema(SchemaTool $schemaTool, EntityManager $entityManager)
     {
-        $schemaTool = new SchemaTool($entityManager);
-        $schemaTool->createSchema($this->getClassMetadatas($entityManager, $classes));
+        $schemaTool->createSchema($this->getClassMetadatas($entityManager));
     }
 
-    private function dropSchema(EntityManager $entityManager, array $classes)
+    private function dropSchema(SchemaTool $schemaTool, EntityManager $entityManager)
     {
-        $schemaTool = new SchemaTool($entityManager);
-        $schemaTool->dropSchema($this->getClassMetadatas($entityManager, $classes));
+        $schemaTool->dropSchema($this->getClassMetadatas($entityManager));
     }
 
-    private function getClassMetadatas(EntityManager $entityManager, array $classes)
+    private function getClassMetadatas(EntityManager $entityManager)
     {
-        $classMetadatas = array_map(
-            function ($class) use ($entityManager) {
-                return $entityManager->getClassMetadata($class);
-            },
-            $classes
-        );
-
-        return $classMetadatas;
+        return $entityManager->getMetadataFactory()->getAllMetadata();
     }
 }

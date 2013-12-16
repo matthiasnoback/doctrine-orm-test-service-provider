@@ -7,11 +7,9 @@ use Noback\PHPUnitTestServiceContainer\Tests\PHPUnit\Entity\User;
 
 class AbstractTestCaseWithEntityManagerTest extends AbstractTestCaseWithEntityManager
 {
-    protected function getEntityClasses()
+    protected function getEntityDirectories()
     {
-        return array(
-            'Noback\PHPUnitTestServiceContainer\Tests\PHPUnit\Entity\User'
-        );
+        return array(__DIR__.'/Entity');
     }
 
     /**

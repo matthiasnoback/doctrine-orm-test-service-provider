@@ -12,13 +12,13 @@ abstract class AbstractTestCaseWithEntityManager extends AbstractTestCaseWithSer
      *
      * @return array
      */
-    abstract protected function getEntityClasses();
+    abstract protected function getEntityDirectories();
 
     protected function getServiceProviders()
     {
         return array(
             new DoctrineDbalServiceProvider(),
-            new DoctrineOrmServiceProvider($this->getEntityClasses())
+            new DoctrineOrmServiceProvider($this->getEntityDirectories())
         );
     }
 
