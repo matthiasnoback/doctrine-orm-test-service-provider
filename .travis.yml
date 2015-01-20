@@ -8,11 +8,14 @@ env:
   - DOCTRINE_VERSION: 2.2.*
   - DOCTRINE_VERSION: 2.3.*
   - DOCTRINE_VERSION: 2.4.*
-  - DOCTRINE_VERSION: 2.5@dev
+  - DOCTRINE_VERSION: 2.5.*@dev
 
-before_script:
+before_install:
   - composer selfupdate
-  - composer require doctrine/orm:${DOCTRINE_VERSION}
+  - composer require --no-update doctrine/orm:${DOCTRINE_VERSION}
+
+install:
+  - composer update
 
 script:
   - vendor/bin/phpunit

@@ -15,7 +15,7 @@
     "require": {
         "matthiasnoback/phpunit-test-service-container": "~2.0",
         "matthiasnoback/doctrine-dbal-test-service-provider": "~2.0",
-        "doctrine/orm": "2.*"
+        "doctrine/orm": "~2.5@dev"
     },
     "require-dev": {
         "phpunit/phpunit": "3.*"
@@ -23,5 +23,7 @@
     "target-dir": "Noback/PHPUnitTestServiceContainer",
     "autoload": {
         "psr-0" : { "Noback\\PHPUnitTestServiceContainer" : "" }
-    }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }
