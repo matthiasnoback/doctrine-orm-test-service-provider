@@ -13,8 +13,8 @@
         }
     ],
     "require": {
-        "matthiasnoback/phpunit-test-service-container": "1.*",
-        "matthiasnoback/doctrine-dbal-test-service-provider": "1.*",
+        "matthiasnoback/phpunit-test-service-container": "~2.0",
+        "matthiasnoback/doctrine-dbal-test-service-provider": "~2.0",
         "doctrine/orm": "2.*"
     },
     "require-dev": {
