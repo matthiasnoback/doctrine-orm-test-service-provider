@@ -1,6 +1,11 @@
 <?php
 
-namespace Noback\PHPUnitTestServiceContainer\Tests\PHPUnit\Entity;
+namespace Noback\PHPUnitTestServiceContainer\PHPUnit\Entity;
+
+use Doctrine\ORM\Mapping\Column;
+use Doctrine\ORM\Mapping\Entity;
+use Doctrine\ORM\Mapping\GeneratedValue;
+use Doctrine\ORM\Mapping\Id;
 
 /**
  * @Entity

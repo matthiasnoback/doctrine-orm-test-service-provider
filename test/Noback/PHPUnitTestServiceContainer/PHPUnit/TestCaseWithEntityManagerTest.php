@@ -1,15 +1,19 @@
 <?php
 
-namespace Noback\PHPUnitTestServiceContainer\Tests\PHPUnit;
+namespace Noback\PHPUnitTestServiceContainer\PHPUnit;
 
-use Noback\PHPUnitTestServiceContainer\PHPUnit\AbstractTestCaseWithEntityManager;
-use Noback\PHPUnitTestServiceContainer\Tests\PHPUnit\Entity\User;
+use Doctrine\Common\EventManager;
+use Doctrine\DBAL\Connection;
+use Noback\PHPUnitTestServiceContainer\PHPUnit\Entity\User;
+use PHPUnit\Framework\TestCase;
 
-class AbstractTestCaseWithEntityManagerTest extends AbstractTestCaseWithEntityManager
+final class TestCaseWithEntityManagerTest extends TestCase
 {
+    use TestCaseWithEntityManager;
+
     protected function getEntityDirectories()
     {
-        return array(__DIR__.'/Entity');
+        return array(__DIR__ . '/Entity');
     }
 
     /**
@@ -36,12 +40,28 @@ class AbstractTestCaseWithEntityManagerTest extends AbstractTestCaseWithEntityMa
     {
         $count = $this
             ->getEntityManager()
-            ->getRepository('Noback\PHPUnitTestServiceContainer\Tests\PHPUnit\Entity\User')
+            ->getRepository(User::class)
             ->createQueryBuilder('u')
             ->select('COUNT(u.id) as number_of_users')
             ->getQuery()
             ->getSingleScalarResult();
 
-        $this->assertSame(0, (integer) $count);
+        $this->assertSame(0, (integer)$count);
+    }
+
+    /**
+     * @test
+     */
+    public function the_dbal_connection_can_be_retrieved()
+    {
+        $this->assertInstanceOf(Connection::class, $this->getConnection());
+    }
+
+    /**
+     * @test
+     */
+    public function the_event_manager_can_be_retrieved()
+    {
+        $this->assertInstanceOf(EventManager::class, $this->getEventManager());
     }
 }

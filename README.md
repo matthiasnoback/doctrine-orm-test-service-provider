@@ -7,8 +7,8 @@ tests](https://github.com/matthiasnoback/phpunit-test-service-container).
 
 ## Usage
 
-Extend your test class from ``Noback\PHPUnitTestServiceContainer\PHPUnit\AbstractTestCaseWithEntityManager``. You then
-need to implement the ``getEntityClasses()`` which should return an array of entity class names.
+Use the trait `Noback\PHPUnitTestServiceContainer\PHPUnit\TestCaseWithEntityManager` in your test class. You then
+need to implement the `getEntityDirectories()` which should return an array of the directories containing the entities that should be loaded.
 
 For each test method a connection to an SQLite database will be available.
 Also the schema for the given entities will be created automatically.
@@ -16,14 +16,17 @@ Also the schema for the given entities will be created automatically.
 ```php
 <?php
 
-use Noback\PHPUnitTestServiceContainer\PHPUnit\AbstractTestCaseWithEntityManager;
+use PHPUnit\Framework\TestCase;
+use Noback\PHPUnitTestServiceContainer\PHPUnit\TestCaseWithEntityManager;
 
-class StorageTest extends AbstractTestCaseWithEntityManager
+class StorageTest extends TestCase 
 {
-    protected function getEntityClasses()
+    use TestCaseWithEntityManager;
+    
+    protected function getEntityDirectories(): array
     {
         return array(
-            'Noback\PHPUnitTestServiceContainer\Tests\PHPUnit\Entity\User'
+            __DIR__ . '/Entity'
         );
     }
 
@@ -43,8 +46,8 @@ class StorageTest extends AbstractTestCaseWithEntityManager
 
 Of course, you would usually inject the entity manager into some object which is the subject-under-test.
 
-To register Doctrine event listeners/subscribers, get the ``EventManager`` instance by calling
-``$this->getEventManager()``. To get the database ``Connection`` object, call ``$this->getConnection()``.
+To register Doctrine event listeners/subscribers, get the `EventManager` instance by calling
+`$this->getEventManager()`. To get the database `Connection` object, call `$this->getConnection()`.
 
 ## Read more
 
