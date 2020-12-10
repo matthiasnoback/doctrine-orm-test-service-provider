@@ -21,7 +21,7 @@
     "matthiasnoback/phpunit-test-service-container": "^3.0",
     "matthiasnoback/doctrine-dbal-test-service-provider": "^3.0",
     "doctrine/orm": "^2.5",
-    "phpunit/phpunit": "^6.0 || ^7.0 || ^8.0"
+    "phpunit/phpunit": "^6.0 || ^7.0 || ^8.0 || ^9.0"
   },
   "autoload": {
     "psr-4": {
