@@ -25,10 +25,6 @@ class DoctrineOrmServiceProvider implements ServiceProvider
         $serviceContainer['doctrine_orm.development_mode'] = true;
         $serviceContainer['doctrine_orm.proxy_dir'] = sys_get_temp_dir();
 
-        $serviceContainer['doctrine_orm.driver_cache'] = function () {
-            return new ArrayCache();
-        };
-
         $serviceContainer['doctrine_orm.entity_manager'] = function (ServiceContainer $serviceContainer) {
             return EntityManager::create(
                 $serviceContainer['doctrine_dbal.connection'],
@@ -41,8 +37,7 @@ class DoctrineOrmServiceProvider implements ServiceProvider
             return Setup::createAnnotationMetadataConfiguration(
                 $serviceContainer['doctrine_orm.entity_directories'],
                 $serviceContainer['doctrine_orm.development_mode'],
-                $serviceContainer['doctrine_orm.proxy_dir'],
-                $serviceContainer['doctrine_orm.driver_cache']
+                $serviceContainer['doctrine_orm.proxy_dir']
             );
         };
 
