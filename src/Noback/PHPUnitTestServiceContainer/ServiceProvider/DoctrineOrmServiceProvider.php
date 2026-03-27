@@ -7,8 +7,8 @@ use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\ORM\ORMSetup;
 use Noback\PHPUnitTestServiceContainer\ServiceContainer;
 use Noback\PHPUnitTestServiceContainer\ServiceProvider;
-use Noback\PHPUnitTestServiceContainer\Cache\ArrayCachePool;
 use Pimple\Container;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 
 class DoctrineOrmServiceProvider implements ServiceProvider
 {
@@ -37,7 +37,7 @@ class DoctrineOrmServiceProvider implements ServiceProvider
                 $serviceContainer['doctrine_orm.entity_directories'],
                 $serviceContainer['doctrine_orm.development_mode'],
                 $serviceContainer['doctrine_orm.proxy_dir'],
-                new ArrayCachePool()
+                new ArrayAdapter()
             );
 
             return $config;
