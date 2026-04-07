@@ -40,6 +40,10 @@ class DoctrineOrmServiceProvider implements ServiceProvider
                 new ArrayCachePool()
             );
 
+            if (method_exists(ProxyHelper::class, 'generateLazyGhost') === false) {
+                $config->enableNativeLazyObjects(true);
+            }
+
             return $config;
         };
 
